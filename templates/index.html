@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% block title %}
+login-app
+{% endblock %}
+ 
+{% block headline %}
+{{title}}
+{{message}}
+{% endblock %}
+ 
+{% block content %}
+<div id="app" class="m-3">
+    <mycomp />
+</div>
+ 
+{% raw %}
+<script type="text/x-template" id="mycomp-template">
+    <div>
+        <div class="alert alert-info">
+            <h5>{{alert}}</h5>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for = "id">Name</label>
+            <input type="text" class="form-control"
+            id="name" v-model="f_name">
+        </div>
+        <div class="form-group">
+            <label for = "mail">Mail</label>
+            <input type="mail" class="form-control"
+            id="mail" v-model="f_mail">
+        </div>
+        <div class="form-group">
+            <label for = "age">Age</label>
+            <input type="number" class="form-control"
+            id="age" v-model="f_age">
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary"
+            v-on:click="action">Update</button>
+        </div>
+ 
+ 
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Mail</th>
+                        <th>Age</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for= "item in data">
+                        <th>{{item.id}}</th>
+                        <th>{{item.name}}</th>
+                        <th>{{item.mail}}</th>
+                        <th>{{item.age}}</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</script>
+{% endraw %}
+ 
+ 
+<script>
+// mycomp_board object
+Vue.component('mycomp',{
+    template:'#mycomp-template',
+    data: function(){
+        return{
+            s_id: {{id}},
+            f_name:'',f_mail:'',f_age:'',
+            alert: 'This is SQLite3 Database sample_index',
+            data:[(-1,'wait...','','')]
+        }
+    },
+    methods:{
+        getdata: function(){
+            let self = this;
+            $.get("/ajax", function(data){
+                self.data=eval(data).reverse();
+            });
+        },
+        getById:function(){
+            let self =this;
+            $.get("/ajax/" + this.s_id, function(data){
+                target = eval(data);
+                self.f_name = target.name;
+                self.f_mail = target.mail;
+                self.f_age = target.age;
+                self.alert = '*ID番号 ' + self.s_id +' を編集します';
+            });
+        },
+        action: function(){
+            let formData = new FormData();
+            formData.append("name", this.f_name);
+            formData.append("mail", this.f_mail);
+            formData.append("age", this.f_age);
+            let self = this;
+            $.ajax({
+                type:'POST',
+                url:'/form/' + self.s_id,
+                data: formData,
+                processData: false,
+                contentType: false,
+ 
+                success: function(data){
+                    self.f_name='';
+                    self.f_mail='';
+                    self.f_age= '';
+                    self.getdata();
+                },
+                error: function(request, status, err) {
+                    console.log(err);
+                }
+            });
+        }
+    },
+    created: function() {
+        this.getdata();
+        this.getById();
+    }
+});
+    // start Vue.
+    new Vue({
+        el:'#app',
+    });
+    </script>
+    {% endblock %}
+    {% block footer %}
+     <h6>Coryright 2020 Rope_blog </h6>
+    {% endblock %}
