@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}
+Top-page
+{% endblock %}
+ 
+{% block headline %}
+{{title}}
+{% endblock %}
+ 
+{% block content %}
+<a href="fi" butoon class="m-1 btn btn-link btn-lg">レコードの検索</butoon>
+<a href="create" butoon class="m-1 btn btn-primary btn-lg">レコードの新規追加</a>
+<a href="update" butoon class="m-1 btn btn-info btn-lg">レコードの更新</a>
+<a href="delete" butoon class="m-1 btn btn-success btn-lg">レコードの削除</a>
+{% endblock %}
+{% block footer %}
+<h6>Coryright 2020 Rope_blog </h6>
+{% endblock %}

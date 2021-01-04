@@ -56,28 +56,180 @@ def getAll():
     res = ses.query(Mydata).all()
     ses.close()
     return res
-  
- 
+
+
+#####TOPページ#########################################
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index1.html',\
-        title='Sample code',)
-@app.route('/search', methods=['GET'])
-def index_search():
-    return render_template('index2.html',\
-        title='Sample code',)
+    return render_template('index_top.html',\
+        title="実施したい項目を選んでください"
+        )
 
-# @app.route('/', methods=['GET'])
-# def index():
-#     mydata=[]:
-#     db = get_db()
-#     cur = db.execute("select * from mydata")
-#     mydata = cur.frtchall()
-#     return render_template('index1.htm',\
-#         data=mydata)
-#     return render_template('index.html',\
-#         title='This is smaple of ORM',)
+
+##### 新規作成 #######################################
+@app.route('/create', methods=['GET'])
+def create():
+    return render_template('index_create.html',\
+        title='新規作成',)
+ 
+@app.route('/create/ajax', methods=['GET'])
+def ajax_create():
+    mydata = getAll()
+    return jsonify(getByList(mydata));
+ 
+@app.route('/create/form', methods=['post'])
+def form_create():
+    name = request.form.get('name')
+    mail = request.form.get('mail')
+    age = int(request.form.get('age'))
+    mydata = Mydata(name=name, mail=mail, age=age)
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    ses.add(mydata)
+    ses.commit()
+    ses.close()
+    return'ok'
+
+###### 検索 ##########################################
+@app.route('/find', methods=['POST'])
+def find():
+    find = request.form.get('find')
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    result = ses.query(Mydata).\
+        filter(Mydata.name == find).all()
+    ses.close()
+    return jsonify(getByList(result));
+
+@app.route('/fi', methods=['GET'])
+def fi():
+    return render_template('index_find.html',\
+        title='レコードの検索',)
+   
+@app.route('/fi/ajax', methods=['GET'])
+def fi_ajax():
+    mydata = getAll()
+    return jsonify(getByList(mydata));
+   
+@app.route('/fi/form', methods=['post'])
+def fi_form():
+    name = request.form.get('name')
+    mail = request.form.get('mail')
+    age = int(request.form.get('age'))
+    mydata = Mydata(name=name, mail=mail, age=age)
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    ses.add(mydata)
+    ses.commit()
+    ses.close()
+    return'ok'
+   
+@app.route('/fi/<id>', methods=['GET'])
+def fi_index_id(id):
+    return render_template('index.html',\
+        title='Sample of Update', id=id, \
+        message='SQL',
+        alert='Hello SQL')
   
+@app.route('/fi/ajax/<id>', methods=['GET'])
+def fi_ajax_id(id):
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    mydata = ses.query(Mydata).filter(Mydata.id == id).one()
+    ses.close()
+    return jsonify(mydata.toDict());
+  
+@app.route('/fi/form/<id>', methods=['post'])
+def fi_form_id(id):
+    name = request.form.get('name')
+    mail = request.form.get('mail')
+    age = int(request.form.get('age'))
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    mydata = ses.query(Mydata).filter(Mydata.id == id).one()
+    mydata.name = name
+    mydata.mail = mail
+    mydata.age = int(age)
+    ses.add(mydata)
+    ses.commit()
+    ses.close()
+    return 'ok'
+###################################################
+
+#######更新########################################
+
+@app.route('/update', methods=['GET'])
+def update_sel():
+    return render_template('index_update_sel.html',\
+        title='レコードの更新',)
+
+@app.route('/up/ajax', methods=['GET'])
+def up_ajax():
+    mydata = getAll()
+    return jsonify(getByList(mydata));
+  
+@app.route('/up/form', methods=['post'])
+def up_form():
+    name = request.form.get('name')
+    mail = request.form.get('mail')
+    age = int(request.form.get('age'))
+    mydata = Mydata(name=name, mail=mail, age=age)
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    ses.add(mydata)
+    ses.commit()
+    ses.close()
+    return'ok'
+  
+@app.route('/up/<id>', methods=['GET'])
+def up_index_id(id):
+    return render_template('index_update.html',\
+        title='レコードIDの更新', id=id, \
+        alert='Hello SQL')
+ 
+@app.route('/up/ajax/<id>', methods=['GET'])
+def up_ajax_id(id):
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    mydata = ses.query(Mydata).filter(Mydata.id == id).one()
+    ses.close()
+    return jsonify(mydata.toDict());
+ 
+@app.route('/up/form/<id>', methods=['post'])
+def up_form_id(id):
+    name = request.form.get('name')
+    mail = request.form.get('mail')
+    age = int(request.form.get('age'))
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    mydata = ses.query(Mydata).filter(Mydata.id == id).one()
+    mydata.name = name
+    mydata.mail = mail
+    mydata.age = int(age)
+    ses.add(mydata)
+    ses.commit()
+    ses.close()
+    return 'ok'
+###########削除##################################################
+
+
+@app.route('/delete', methods=['GET'])
+def delete_sel():
+    return render_template('index_delete_sel.html',\
+        title='レコードの削除',)
+
+@app.route('/del/<id>', methods=['GET'])
+def del_id(id):
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    mydata = ses.query(Mydata).filter(Mydata.id ==id).one()
+    ses.delete(mydata)
+    ses.commit()
+    ses.close()
+    return "delete id =" + id
+
+################################################################
+
 @app.route('/ajax', methods=['GET'])
 def ajax():
     mydata = getAll()
@@ -137,17 +289,6 @@ def delete_id(id):
     ses.close()
     return "delete id =" + id
 
-@app.route('/find', methods=['POST'])
-def find():
-    find = request.form.get('find')
-    Session = sessionmaker(bind=engine)
-    ses = Session()
-    result = ses.query(Mydata).\
-        filter(Mydata.name == find).all()
-    ses.close()
-    return jsonify(getByList(result));
-
- 
 if __name__ == '__main__':
     app.debug=True
     app.run()

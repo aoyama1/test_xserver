@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}
+Top-page
+{% endblock %}
+ 
+{% block headline %}
+{{title}}
+<a href="/" butoon class="m-1 btn btn-success">戻る</a>
+{% endblock %}
+ 
+{% block content %}
+<script type="text/javascript"> 
+    function changeURL(){
+            var url = "/del/";
+            if(document.getElementById('number').value){
+            url += document.getElementById('number').value;
+            }
+           location.href =url
+        }
+</script>   
+<form class="form-inline" id="fh5co-header-subscribe">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="form-group">
+        <input type="text" class="form-control" id="number" placeholder="削除したいIDを入力">
+        <input type="button" value="送信" class="btn btn-default" onclick="changeURL();">
+      </div>
+   </div>
+</form>
+{% endblock %}
+{% block footer %}
+<h6>Coryright 2020 Rope_blog </h6>
+{% endblock %}
